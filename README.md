@@ -111,7 +111,7 @@ Ao final das execuções, o framework gera um relatório em reports/cucumber\_re
 
 Durante a execução da suíte de testes automatizados, foi identificado um comportamento inesperado no ambiente. A evidência detalhada, incluindo passos para reprodução e impacto, pode ser consultada no link abaixo:
 
-* [**Relatório de Bug: Falha na validação de X**](./BUG_REPORT.md)
+* [**Relatório de Bug: Falha na validação de @camposobrigatorios**](./BUG_REPORT.md)
 
 
 ---
