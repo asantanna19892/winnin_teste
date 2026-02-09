@@ -1,0 +1,16 @@
+# Dependências 
+node_modules/
+dist/
+.npm/
+
+# Relatórios e Evidências 
+reports/
+cucumber_report.json
+cucumber_report.html
+
+
+# Configurações de Ambiente (arquivo de exemplo foi adicionado ao repositório, mas o real deve ser ignorado)
+.env
+
+
+

@@ -1,0 +1,18 @@
+{
+  "default": {
+    "paths": [
+      "tests/e2e/features/**/*.feature",
+      "tests/api/features/**/*.feature"
+    ],
+    "require": [
+      "tests/support/**/*.js",
+      "tests/e2e/features/step_definitions/**/*.js",
+      "tests/api/features/step_definitions/**/*.js"
+    ],
+    "format": [
+      "progress-bar",
+      "json:reports/cucumber_report.json",
+      "html:reports/cucumber_report_simple.html"
+    ]
+  }
+}

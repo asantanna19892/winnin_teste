@@ -1,0 +1,99 @@
+name: Test Automation Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+    inputs:
+      tags:
+        description: 'Quais tags rodar? (ex: @api, @destaque, @all)'
+        required: false
+        default: '@all' 
+
+jobs:
+  # ---------------------------------------------------
+  # JOB 1: API - Só roda se for @all, @api ou Push
+  # ---------------------------------------------------
+  api-tests:
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'push' || 
+      github.event.inputs.tags == '@all' || 
+      contains(github.event.inputs.tags, '@api') ||
+      github.event.inputs.tags == ''
+    steps:
+      - name: Checkout do Código
+        uses: actions/checkout@v4
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Instalar Dependências
+        run: npm ci
+
+      - name: Subir ServeRest Localmente
+        run: |
+          npx serverest@latest -p 3000 & 
+          npx wait-on http://localhost:3000 --timeout 60000
+
+      - name: Rodar Testes de API e Gerar Report
+        run: |
+          mkdir -p reports
+          TAGS="${{ github.event.inputs.tags }}"
+          if [ -z "$TAGS" ] || [ "$TAGS" == "@all" ]; then TAGS="@api"; fi
+          
+          echo "🚀 Rodando API com tags: $TAGS"
+          API_URL=http://localhost:3000 npx cucumber-js --tags "$TAGS" -f json:reports/cucumber_report.json || true
+          node generate-report.js
+
+      - name: Upload Relatório Profissional API
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-fancy-report
+          path: reports/
+
+  # ---------------------------------------------------
+  # JOB 2: E2E (Front) - Só roda se NÃO for apenas @api
+  # ---------------------------------------------------
+  e2e-tests:
+    runs-on: ubuntu-latest
+    # Só inicia se não for um teste exclusivo de API
+    if: |
+      github.event_name == 'push' || 
+      github.event.inputs.tags == '@all' || 
+      (!contains(github.event.inputs.tags, '@api') && github.event.inputs.tags != '') ||
+      github.event.inputs.tags == ''
+    steps:
+      - name: Checkout do Código
+        uses: actions/checkout@v4
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Instalar Dependências
+        run: npm ci
+
+      - name: Instalar Navegadores do Playwright
+        run: npx playwright install chromium
+
+      - name: Rodar Testes E2E e Gerar Report
+        run: |
+          mkdir -p reports
+          TAGS="${{ github.event.inputs.tags }}"
+          if [ -z "$TAGS" ] || [ "$TAGS" == "@all" ]; then TAGS="not @api"; fi
+          
+          echo "🚀 Rodando E2E com tags: $TAGS"
+          HEADLESS=true npx cucumber-js --tags "$TAGS" -f json:reports/cucumber_report.json || true
+          node generate-report.js
+
+      - name: Upload Relatório Profissional E2E
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-fancy-report
+          path: reports/

@@ -1,0 +1,31 @@
+{
+  "name": "winnin-teste",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "cucumber-js",
+    "report": "node generate-report.js",
+    "test:api:local": "cross-env API_URL=http://localhost:3000 cucumber-js --tags \"@api\" ; npm run report",
+    "test:api:public": "cucumber-js --tags \"@api\" ; npm run report",
+    "test:e2e:headless": "cross-env HEADLESS=true cucumber-js --tags \"not @api\" ; npm run report",
+    "test:e2e:headed": "cross-env HEADLESS=false cucumber-js --tags \"not @api\" ; npm run report",
+    "test:all": "npm run test:api:local && npm run test:e2e:headless"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@cucumber/cucumber": "^12.6.0",
+    "@faker-js/faker": "^10.3.0",
+    "@playwright/test": "^1.58.2",
+    "@types/node": "^25.2.0",
+    "cucumber-html-reporter": "^6.0.0",
+    "npm-run-all": "^4.1.5"
+  },
+  "dependencies": {
+    "cross-env": "^7.0.3",
+    "dotenv": "^17.2.4",
+    "wait-on": "^7.2.0"
+  }
+}
